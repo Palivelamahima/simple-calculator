@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Calculator</title>
+  <link rel="icon" href="https://i.postimg.cc/fypbMvBn/favicon.png" type="image/png">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #0f172a;
+      color: #f1f5f9;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .calculator {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 320px;
+    }
+    .display {
+      width: 100%;
+      height: 60px;
+      background: #0f172a;
+      color: #00d4ff;
+      font-size: 2rem;
+      text-align: right;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      overflow-x: auto;
+    }
+    #last-result {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      text-align: right;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 20px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #334155;
+      color: #f1f5f9;
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #475569;
+      transform: scale(1.03);
+    }
+    button:active {
+      transform: scale(0.95);
+      background: #64748b;
+    }
+    .equal {
+      background: #00d4ff;
+      color: #0f172a;
+      font-weight: bold;
+    }
+    .clear {
+      background: #ef4444;
+    }
+    @media (max-width: 400px) {
+      .calculator { width: 90%; }
+      button { padding: 16px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div id="display" class="display">0</div>
+    <div id="last-result"></div>
+    <div class="buttons">
+      <button onclick="clearDisplay()" class="clear">C</button>
+      <button onclick="appendToDisplay('(')">(</button>
+      <button onclick="appendToDisplay(')')">)</button>
+      <button onclick="appendToDisplay('/')">÷</button>
+
+      <button onclick="appendToDisplay('7')">7</button>
+      <button onclick="appendToDisplay('8')">8</button>
+      <button onclick="appendToDisplay('9')">9</button>
+      <button onclick="appendToDisplay('*')">×</button>
+
+      <button onclick="appendToDisplay('4')">4</button>
+      <button onclick="appendToDisplay('5')">5</button>
+      <button onclick="appendToDisplay('6')">6</button>
+      <button onclick="appendToDisplay('-')">−</button>
+
+      <button onclick="appendToDisplay('1')">1</button>
+      <button onclick="appendToDisplay('2')">2</button>
+      <button onclick="appendToDisplay('3')">3</button>
+      <button onclick="appendToDisplay('+')">+</button>
+
+      <button onclick="appendToDisplay('0')">0</button>
+      <button onclick="appendToDisplay('.')">.</button>
+      <button onclick="calculate()" class="equal">=</button>
+      <button onclick="backspace()">⌫</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const lastResult = document.getElementById('last-result');
+
+    function appendToDisplay(value) {
+      if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = value;
+      } else {
+        display.textContent += value;
+      }
+    }
+
+    function clearDisplay() {
+      display.textContent = '0';
+      display.style.color = "#00d4ff";
+    }
+
+    function calculate() {
+      try {
+        let expression = display.textContent.replace(/÷/g, '/').replace(/×/g, '*');
+        expression = expression.replace(/[^0-9+\-*/().]/g, '');
+
+        const result = eval(expression);
+        lastResult.textContent = `Last result: ${display.textContent}`;
+        display.textContent = Number.isInteger(result) ? result : result.toFixed(2);
+
+        display.style.color = "#22c55e"; // green
+        setTimeout(() => { display.style.color = "#00d4ff"; }, 500);
+      } catch {
+        display.textContent = 'Error';
+        display.style.color = "#ef4444";
+        setTimeout(() => { display.style.color = "#00d4ff"; }, 1000);
+      }
+    }
+
+    function backspace() {
+      if (display.textContent.length === 1 || display.textContent === 'Error') {
+        display.textContent = '0';
+      } else {
+        display.textContent = display.textContent.slice(0, -1);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if ((/\d|\+|\-|\*|\/|\(|\)|\./).test(key)) {
+        appendToDisplay(key);
+      } else if (key === 'Enter') {
+        e.preventDefault();
+        calculate();
+      } else if (key === 'Backspace') {
+        backspace();
+      } else if (key.toLowerCase() === 'c') {
+        clearDisplay();
+      }
+    });
+  </script>
+</body>
+</html>
+
